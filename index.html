@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>Intro to MapView - Create a 2D map - 4.15</title>
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.15/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.15/"></script>
+
+    <script>
+      require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/layers/FeatureLayer",
+        "esri/widgets/Legend",
+        "esri/widgets/ScaleBar",
+        
+        ], function(Map, MapView, FeatureLayer, Legend, ScaleBar) {
+          var flayer = new FeatureLayer({url:"https://www.arcgisonline.cn/server/rest/services/Hosted/%E5%85%AC%E4%BC%97%E6%8A%A5%E5%91%8A%E9%9D%9E%E7%B4%A7%E6%80%A5%E4%BA%8B%E4%BB%B6201700431%E7%86%8A%E5%A4%8F%E6%82%A6_1/FeatureServer"});
+        var map = new Map({
+          basemap: "topo",
+          layers:[flayer]
+        });
+        //map.layers.add();
+        var view1 = new MapView({
+          container: "viewDiv",
+          map: map,
+          zoom: 5,
+          center: [119, 20] // longitude, latitude
+        });
+        var legend = new Legend({
+  view: view1,
+  layerInfos: [{
+    layer: flayer,
+    title: "FAFU"
+  }]
+});
+
+view1.ui.add(legend, "bottom-right");
+var scaleBar = new ScaleBar({
+  view: view1
+});
+
+view1.ui.add(scaleBar, {
+  position: "bottom-left"
+});
+var coordsWidget = document.createElement("div");
+      coordsWidget.id = "coordsWidget";
+      coordsWidget.className = "esri-widget esri-component";
+      coordsWidget.style.padding = "7px 15px 5px";
+
+      view1.ui.add(coordsWidget, "bottom-right");
+       function showCoordinates(pt) {
+        var coords = "Lat/Lon " + pt.latitude.toFixed(3) + " " + pt.longitude.toFixed(3) +
+            " | Scale 1:" + Math.round(view1.scale * 1) / 1 +
+            " | Zoom " + view1.zoom;
+        coordsWidget.innerHTML = coords;
+      }
+      view1.watch("stationary", function(isStationary) {
+        showCoordinates(view1.center);
+      });
+
+      view1.on("pointer-move", function(evt) {
+        showCoordinates(view1.toMap({ x: evt.x, y: evt.y }));
+      });
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+</html>
